@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>lana. — Tu dinero, claro y sin drama</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --carbon:#1A1916; --lima:#C9F542; --lima-dark:#A8CC1A;
+  --crema:#F8F7F4; --crema2:#FFFFFF; --crema3:#F0EEE9;
+  --text:#1A1916; --text2:#6B6A65; --text3:#9E9D99;
+  --border:rgba(0,0,0,.09); --border2:rgba(0,0,0,.15);
+  --red:#A32D2D; --red-bg:#FCEBEB;
+  --green:#3B6D11; --green-bg:#EAF3DE;
+  --amber:#854F0B; --amber-bg:#FAEEDA;
+  --blue:#185FA5; --blue-bg:#E6F1FB;
+  --radius:10px; --radius-sm:6px; --radius-lg:16px;
+  --font:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+html.dark{
+  --crema:#111110; --crema2:#1C1C1A; --crema3:#252523;
+  --text:#F0EEE9; --text2:#A8A79F; --text3:#6B6A65;
+  --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.14);
+  --red:#E24B4A; --red-bg:#2A1111;
+  --green:#5DCAA5; --green-bg:#0A2E22;
+  --amber:#EF9F27; --amber-bg:#2A1E08;
+  --blue:#378ADD; --blue-bg:#0A1929;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);background:var(--crema);color:var(--text);font-size:14px;transition:background .2s,color .2s}
+
+/* ── PANTALLAS ── */
+.pantalla{display:none;min-height:100vh}
+.pantalla.activa{display:flex;flex-direction:column}
+
+/* ── ONBOARDING / AUTH ── */
+#p-bienvenida{background:var(--carbon);align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.ob-mark{width:72px;height:72px;border-radius:20px;background:var(--lima);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.ob-mark-dot{width:28px;height:28px;border-radius:50%;background:var(--carbon)}
+.ob-name{font-size:34px;font-weight:500;color:#fff;letter-spacing:-.5px;margin-bottom:8px}
+.ob-name span{color:var(--lima)}
+.ob-sub{font-size:14px;color:rgba(255,255,255,.4);line-height:1.6;margin-bottom:40px;max-width:280px}
+.ob-btn{background:var(--lima);color:var(--carbon);border:none;border-radius:var(--radius);padding:15px 32px;font-size:14px;font-weight:500;cursor:pointer;width:100%;max-width:320px;font-family:var(--font);transition:opacity .15s}
+.ob-btn:hover{opacity:.88}
+.ob-login{font-size:13px;color:rgba(255,255,255,.35);margin-top:16px;cursor:pointer}
+.ob-login span{color:rgba(255,255,255,.6);text-decoration:underline}
+
+/* Pasos de onboarding */
+#p-onboarding{background:var(--crema)}
+.ob-topbar{background:var(--carbon);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.ob-steps{display:flex;gap:4px;flex:1}
+.ob-step{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.15);transition:background .3s}
+.ob-step.hecho{background:var(--lima)}
+.ob-back{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:20px;padding:0;line-height:1}
+.ob-skip{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:12px;font-family:var(--font)}
+
+.ob-body{flex:1;padding:24px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.ob-titulo{font-size:20px;font-weight:500;color:var(--text);line-height:1.3}
+.ob-subtitulo{font-size:13px;color:var(--text2);line-height:1.5;margin-top:4px}
+.ob-footer{padding:16px 20px 28px}
+
+/* ── LOGIN ── */
+#p-login{background:var(--crema);align-items:center;justify-content:center;padding:24px}
+.login-card{background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;width:100%;max-width:360px}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.login-mark{width:32px;height:32px;border-radius:9px;background:var(--carbon);display:flex;align-items:center;justify-content:center}
+.login-mark-dot{width:12px;height:12px;border-radius:50%;background:var(--lima)}
+.login-name{font-size:18px;font-weight:500;letter-spacing:-.3px}
+.login-name span{color:var(--lima)}
+
+/* ── APP PRINCIPAL ── */
+#p-app{display:none;flex-direction:column;height:100vh}
+#p-app.activa{display:flex}
+.app-topbar{background:var(--carbon);padding:0 20px;display:flex;align-items:center;gap:12px;height:54px;flex-shrink:0;position:sticky;top:0;z-index:50}
+.app-logo{display:flex;align-items:center;gap:8px;cursor:pointer}
+.app-mark{width:24px;height:24px;border-radius:7px;background:var(--lima);display:flex;align-items:center;justify-content:center}
+.app-mark-dot{width:9px;height:9px;border-radius:50%;background:var(--carbon)}
+.app-name{font-size:15px;font-weight:500;color:#fff;letter-spacing:-.2px}
+.app-name span{color:var(--lima)}
+.app-user{margin-left:auto;display:flex;align-items:center;gap:10px}
+.app-avatar{width:30px;height:30px;border-radius:50%;background:var(--lima);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--carbon);cursor:pointer}
+.app-nav{background:var(--carbon);border-bottom:1px solid rgba(255,255,255,.08);display:flex;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.app-nav::-webkit-scrollbar{display:none}
+.app-nav-btn{padding:10px 16px;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;font-family:var(--font);white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.app-nav-btn:hover{color:rgba(255,255,255,.7)}
+.app-nav-btn.activo{color:var(--lima);border-bottom-color:var(--lima);font-weight:500}
+.app-content{flex:1;overflow-y:auto;padding:24px 20px}
+.app-page{display:none}
+.app-page.activo{display:block}
+
+/* ── COMPONENTES ── */
+.card{background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
+
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.field label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.field input,.field select,.field textarea{font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--crema2);color:var(--text);font-family:var(--font);width:100%;outline:none;transition:border .15s}
+.field input:focus,.field select:focus{border-color:var(--carbon)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--crema2);color:var(--text);font-size:13px;font-family:var(--font);cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--crema3)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--carbon);border-color:var(--carbon);color:var(--lima)}
+.btn-primary:hover{background:#2C2C2A}
+.btn-danger{background:var(--red-bg);border-color:#F7C1C1;color:var(--red)}
+.btn-full{width:100%;justify-content:center;padding:12px}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+.hero-card{background:var(--carbon);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px}
+.hero-label{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
+.hero-amount{font-size:34px;font-weight:500;color:var(--lima);font-family:var(--mono);line-height:1;letter-spacing:-.5px}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.35);margin-top:5px}
+.hero-bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:14px;overflow:hidden}
+.hero-bar-fill{height:100%;border-radius:2px;background:var(--lima);transition:width .5s}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:5px}
+.stat-val{font-size:20px;font-weight:500;font-family:var(--mono)}
+.stat-val.danger{color:var(--red)}
+.stat-val.success{color:var(--green)}
+
+.mov-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.mov-item:last-child{border-bottom:none}
+.mov-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.mov-info{flex:1;min-width:0}
+.mov-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mov-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.mov-amt{font-size:14px;font-weight:500;font-family:var(--mono);white-space:nowrap}
+
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tipo-card{background:var(--crema2);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
+.tipo-card:hover{border-color:var(--carbon)}
+.tipo-card.sel{border:2px solid var(--carbon);background:var(--crema3)}
+.tipo-name{font-size:13px;font-weight:500;color:var(--text)}
+.tipo-desc{font-size:11px;color:var(--text3)}
+
+.overlay{position:fixed;inset:0;background:rgba(26,25,22,.45);display:none;align-items:center;justify-content:center;z-index:200}
+.overlay.open{display:flex}
+.modal{background:var(--crema2);border-radius:var(--radius-lg);border:1px solid var(--border);padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:500;margin-bottom:20px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);z-index:999;background:var(--carbon);color:var(--lima);padding:11px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:var(--red);color:#fff}
+
+.cuenta-card{background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.cuenta-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cuenta-bal{font-size:18px;font-weight:500;font-family:var(--mono);margin-top:2px}
+
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+
+@media(min-width:640px){.app-content{padding:28px 32px;max-width:860px;margin:0 auto}.field-row{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══ BIENVENIDA ══════════════════════════════════════════════════════════════ -->
+<div class="pantalla activa" id="p-bienvenida">
+  <div class="ob-mark"><div class="ob-mark-dot"></div></div>
+  <div class="ob-name">lana<span>.</span></div>
+  <div class="ob-sub">Tu dinero, claro y sin drama.<br>Hecho para México.</div>
+  <button class="ob-btn" onclick="irA('p-onboarding');initOb()">Crear mi cuenta gratis</button>
+  <div class="ob-login">¿Ya tienes cuenta? <span onclick="irA('p-login')">Entrar aquí</span></div>
+</div>
+
+<!-- ══ ONBOARDING ══════════════════════════════════════════════════════════════ -->
+<div class="pantalla" id="p-onboarding">
+  <div class="ob-topbar">
+    <button class="ob-back" id="ob-back-btn" onclick="obAtras()">←</button>
+    <div class="ob-steps" id="ob-steps"></div>
+    <button class="ob-skip" onclick="irA('p-bienvenida')">Cancelar</button>
+  </div>
+  <div class="ob-body" id="ob-body"></div>
+  <div class="ob-footer">
+    <button class="btn btn-primary btn-full" id="ob-next-btn" onclick="obSiguiente()">Continuar</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ═══════════════════════════════════════════════════════════════════ -->
+<div class="pantalla" id="p-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-mark"><div class="login-mark-dot"></div></div>
+      <div class="login-name">lana<span>.</span></div>
+    </div>
+    <div class="field"><label>Correo</label><input id="l-correo" type="email" placeholder="tuemail@gmail.com"></div>
+    <div class="field"><label>Contraseña</label><input id="l-pass" type="password" placeholder="Tu contraseña"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="login()">Entrar</button>
+    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text3)">
+      ¿No tienes cuenta? <span style="color:var(--carbon);cursor:pointer;font-weight:500" onclick="irA('p-bienvenida')">Crear una gratis</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ════════════════════════════════════════════════════════════════════ -->
+<div id="p-app">
+  <div class="app-topbar">
+    <div class="app-logo">
+      <div class="app-mark"><div class="app-mark-dot"></div></div>
+      <div class="app-name">lana<span>.</span></div>
+    </div>
+    <div class="app-user">
+      <div class="app-avatar" id="app-avatar" onclick="navegar('perfil')">F</div>
+    </div>
+  </div>
+  <div class="app-nav">
+    <button class="app-nav-btn activo" data-page="inicio" onclick="navegar('inicio')">Inicio</button>
+    <button class="app-nav-btn" data-page="gastos" onclick="navegar('gastos')">Gastos</button>
+    <button class="app-nav-btn" data-page="ingresos" onclick="navegar('ingresos')">Ingresos</button>
+    <button class="app-nav-btn" data-page="cuentas" onclick="navegar('cuentas')">Cuentas</button>
+    <button class="app-nav-btn" data-page="categorias" onclick="navegar('categorias')">Categorías</button>
+    <button class="app-nav-btn" data-page="aprende" onclick="navegar('aprende')">Aprende</button>
+    <button class="app-nav-btn" data-page="perfil" onclick="navegar('perfil')">Perfil</button>
+  </div>
+  <div class="app-content">
+
+    <!-- INICIO -->
+    <div class="app-page activo" id="page-inicio">
+      <div class="hero-card">
+        <div class="hero-label">Disponible este periodo</div>
+        <div class="hero-amount" id="h-disponible">$0</div>
+        <div class="hero-sub" id="h-sub">Cargando...</div>
+        <div class="hero-bar"><div class="hero-bar-fill" id="h-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">Gastado <span id="h-gastado" style="color:rgba(255,255,255,.7);font-family:var(--mono)">$0</span></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">Ahorro sugerido <span id="h-ahorro" style="color:var(--lima);font-family:var(--mono)">$0</span></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">Gasté hoy</div><div class="stat-val danger" id="s-hoy">$0</div></div>
+        <div class="stat"><div class="stat-label">Total cuentas</div><div class="stat-val success" id="s-cuentas">$0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Últimos movimientos</div>
+        <div id="lista-ultimos"><div class="empty">Sin movimientos aún</div></div>
+      </div>
+    </div>
+
+    <!-- GASTOS -->
+    <div class="app-page" id="page-gastos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:18px;font-weight:500">Gastos</div>
+        <button class="btn btn-primary btn-sm" onclick="abrirNuevoMovimiento('gasto')">+ Nuevo gasto</button>
+      </div>
+      <div id="lista-gastos"><div class="empty">Sin gastos registrados</div></div>
+    </div>
+
+    <!-- INGRESOS -->
+    <div class="app-page" id="page-ingresos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:18px;font-weight:500">Ingresos</div>
+        <button class="btn btn-primary btn-sm" onclick="abrirNuevoMovimiento('ingreso')">+ Nuevo ingreso</button>
+      </div>
+      <div id="lista-ingresos"><div class="empty">Sin ingresos registrados</div></div>
+    </div>
+
+    <!-- CUENTAS -->
+    <div class="app-page" id="page-cuentas">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:18px;font-weight:500">Mis cuentas</div>
+        <button class="btn btn-primary btn-sm" onclick="abrirNuevaCuenta()">+ Nueva cuenta</button>
+      </div>
+      <div id="lista-cuentas"><div class="empty">Sin cuentas</div></div>
+    </div>
+
+    <!-- CATEGORÍAS -->
+    <div class="app-page" id="page-categorias">
+      <div style="font-size:18px;font-weight:500;margin-bottom:16px">Categorías</div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">De gastos</div>
+          <button class="btn btn-sm" onclick="abrirNuevaCat('gasto')">+ Nueva</button>
+        </div>
+        <div id="lista-cat-gasto"><div class="empty">Sin categorías</div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">De ingresos</div>
+          <button class="btn btn-sm" onclick="abrirNuevaCat('ingreso')">+ Nueva</button>
+        </div>
+        <div id="lista-cat-ingreso"><div class="empty">Sin categorías</div></div>
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div class="app-page" id="page-perfil">
+      <div style="font-size:18px;font-weight:500;margin-bottom:16px">Mi perfil</div>
+      <div class="card">
+        <div class="card-title">Información</div>
+        <div class="field"><label>Nombre</label><input id="prf-nombre" placeholder="Tu nombre"></div>
+        <div class="field"><label>Tipo de ingreso</label>
+          <select id="prf-tipo">
+            <option value="quincenal">Quincena (1 y 15)</option>
+            <option value="semanal">Semanal</option>
+            <option value="mensual">Mensual</option>
+            <option value="variable">Variable / Freelance</option>
+          </select>
+        </div>
+        <div class="field"><label>Monto base</label><input id="prf-monto" type="number" placeholder="0.00"></div>
+        <button class="btn btn-primary" onclick="guardarPerfil()">Guardar cambios</button>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <button class="btn btn-danger btn-full" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- APRENDE -->
+    <div class="app-page" id="page-aprende">
+      <div style="font-size:18px;font-weight:500;margin-bottom:4px">Aprende</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px">Consejos y libros para manejar mejor tu lana</div>
+
+      <!-- Frase del día -->
+      <div style="background:var(--carbon);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:500;color:var(--lima);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Frase del día</div>
+        <div style="font-size:15px;color:#fff;font-weight:500;line-height:1.5" id="frase-del-dia">Cargando...</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:10px">— lana.</div>
+      </div>
+
+      <!-- Consejos -->
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Consejos</div>
+
+      <div class="card" style="border-left:3px solid var(--lima);border-radius:0 var(--radius) var(--radius) 0">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Regla básica del dinero</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:5px">"Págate a ti primero."</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Antes de gastar un peso, aparta tu ahorro. El 10% de tu ingreso al ahorro antes de cualquier gasto. Si esperas a que sobre, nunca sobra.</div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0">
+        <div style="font-size:11px;font-weight:500;color:var(--amber);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Trampa común</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:5px">"La tarjeta de crédito no es ingreso."</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Úsala solo si puedes pagar el total al corte. Si no, estás pagando hasta 80% de interés anual sin darte cuenta.</div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--blue);border-radius:0 var(--radius) var(--radius) 0">
+        <div style="font-size:11px;font-weight:500;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Dato que duele</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:5px">"Un café de $80 diario son $29,200 al año."</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">No se trata de no tomar café. Se trata de saber exactamente qué estás decidiendo con cada peso.</div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0">
+        <div style="font-size:11px;font-weight:500;color:var(--green);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Hábito ganador</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:5px">"Registra cada gasto el mismo día."</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">La disciplina de anotar tus gastos el mismo día que los haces cambia tu relación con el dinero en menos de 30 días.</div>
+      </div>
+
+      <!-- Libros -->
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 10px">Libros recomendados</div>
+
+      <div class="card" style="padding:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:44px;height:58px;border-radius:6px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📗</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">Padre rico, padre pobre</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px">Robert Kiyosaki</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.4">El más leído de finanzas personales. Cambia cómo piensas sobre el dinero y los activos.</div>
+            <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--green-bg);color:var(--green);margin-top:6px;font-weight:500">Mentalidad</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:44px;height:58px;border-radius:6px;background:var(--amber-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📙</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">El hombre más rico de Babilonia</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px">George S. Clason</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.4">Fácil de leer, con historias. Las mismas reglas del dinero de hace 4,000 años que siguen funcionando.</div>
+            <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--amber-bg);color:var(--amber);margin-top:6px;font-weight:500">Clásico</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:44px;height:58px;border-radius:6px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📘</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">Los secretos de la mente millonaria</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px">T. Harv Eker</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.4">Por qué pensamos como pensamos sobre el dinero y cómo reprogramar esos patrones desde la raíz.</div>
+            <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--blue-bg);color:var(--blue);margin-top:6px;font-weight:500">Psicología</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:44px;height:58px;border-radius:6px;background:var(--red-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📕</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">Tu dinero o tu vida</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px">Vicki Robin</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.4">Redefine la relación con el trabajo y el consumo. Para los que quieren libertad financiera real.</div>
+            <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--red-bg);color:var(--red);margin-top:6px;font-weight:500">Libertad</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODAL: Movimiento ══════════════════════════════════════════════════════ -->
+<div class="overlay" id="ov-mov">
+  <div class="modal">
+    <div class="modal-title" id="mov-titulo">Nuevo gasto</div>
+    <input type="hidden" id="mov-tipo">
+    <div class="field-row">
+      <div class="field"><label>Fecha</label><input id="mov-fecha" type="date"></div>
+      <div class="field"><label>Monto ($)</label><input id="mov-monto" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="field"><label>Categoría</label><select id="mov-cat"></select></div>
+    <div class="field"><label>Cuenta</label><select id="mov-cuenta"></select></div>
+    <div class="field"><label>Descripción (opcional)</label><input id="mov-desc" placeholder="¿En qué?"></div>
+    <div id="mov-extra-wrap" style="display:none">
+      <div class="field"><label>Tipo de ingreso</label>
+        <select id="mov-subtipo">
+          <option value="normal">Ingreso normal</option>
+          <option value="extra">Ingreso extra / esporádico</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cerrarModal('ov-mov')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarMovimiento()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Cuenta ══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="ov-cuenta">
+  <div class="modal">
+    <div class="modal-title" id="cuenta-titulo">Nueva cuenta</div>
+    <div class="field"><label>Nombre</label><input id="cta-nombre" placeholder="Ej: BBVA Débito"></div>
+    <div class="field"><label>Tipo</label>
+      <select id="cta-tipo">
+        <option value="efectivo">Efectivo</option>
+        <option value="debito">Tarjeta de débito</option>
+        <option value="credito">Tarjeta de crédito</option>
+        <option value="ahorro">Cuenta de ahorro</option>
+      </select>
+    </div>
+    <div class="field"><label>Saldo actual ($)</label><input id="cta-saldo" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cerrarModal('ov-cuenta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCuenta()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Categoría ═══════════════════════════════════════════════════════ -->
+<div class="overlay" id="ov-cat">
+  <div class="modal">
+    <div class="modal-title" id="cat-titulo">Nueva categoría</div>
+    <input type="hidden" id="cat-tipo-hidden">
+    <div class="field"><label>Nombre</label><input id="cat-nombre" placeholder="Ej: Gimnasio"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cerrarModal('ov-cat')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCategoria()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Estado ────────────────────────────────────────────────────────────────────
+let TOKEN = localStorage.getItem('lana_token');
+let USER  = null;
+let DATA  = { cuentas:[], catGasto:[], catIngreso:[], movimientos:[], resumen:null };
+let OB    = { paso:0, nombre:'', correo:'', pass:'', tipo:'quincenal', monto:0 };
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const API = async (url, opts={}) => {
+  const headers = { 'Content-Type':'application/json' };
+  if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
+  const r = await fetch(url, { headers, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || r.statusText);
+  return data;
+};
+
+const fmtMon = n => '$' + Number(n||0).toLocaleString('es-MX', {minimumFractionDigits:0, maximumFractionDigits:0});
+const hoy = () => new Date().toISOString().split('T')[0];
+
+function toast(msg, tipo='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (tipo==='error' ? ' error':'');
+  setTimeout(() => t.className = 'toast', 3200);
+}
+
+function irA(id) {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('activa');
+}
+
+function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+
+// ── Onboarding ────────────────────────────────────────────────────────────────
+const OB_PASOS = 4;
+
+function initOb() { OB = { paso:0, nombre:'', correo:'', pass:'', tipo:'quincenal', monto:8500 }; renderOb(); }
+
+function renderOb() {
+  // Steps bar
+  const steps = document.getElementById('ob-steps');
+  steps.innerHTML = Array.from({length:OB_PASOS},(_,i) =>
+    `<div class="ob-step ${i<OB.paso?'hecho':''}"></div>`).join('');
+
+  document.getElementById('ob-back-btn').style.display = OB.paso === 0 ? 'none' : 'block';
+  const body = document.getElementById('ob-body');
+  const nextBtn = document.getElementById('ob-next-btn');
+
+  if (OB.paso === 0) {
+    nextBtn.textContent = 'Continuar';
+    body.innerHTML = `
+      <div><div class="ob-titulo">Hola, ¿cómo te llamas?</div>
+      <div class="ob-subtitulo">Solo tu nombre, sin formalidades.</div></div>
+      <div class="field"><label>Tu nombre</label><input id="ob-nombre" placeholder="Francisco" value="${OB.nombre}"></div>
+      <div class="field"><label>Correo electrónico</label><input id="ob-correo" type="email" placeholder="tuemail@gmail.com" value="${OB.correo}"></div>
+      <div class="field"><label>Contraseña</label><input id="ob-pass" type="password" placeholder="Mínimo 6 caracteres"></div>`;
+  } else if (OB.paso === 1) {
+    nextBtn.textContent = 'Continuar';
+    body.innerHTML = `
+      <div><div class="ob-titulo">¿Cómo te llega el dinero?</div>
+      <div class="ob-subtitulo">Lo puedes cambiar cuando quieras.</div></div>
+      <div class="tipo-grid">
+        ${[
+          {v:'quincenal',n:'Quincena',d:'El 1 y el 15 de cada mes'},
+          {v:'semanal',n:'Semanal',d:'Cada semana, mismo día'},
+          {v:'mensual',n:'Mensual',d:'Un pago al mes, fecha fija'},
+          {v:'variable',n:'Variable',d:'Freelance o negocio propio'}
+        ].map(t=>`<div class="tipo-card ${OB.tipo===t.v?'sel':''}" onclick="selObTipo('${t.v}',this)">
+          <div class="tipo-name">${t.n}</div>
+          <div class="tipo-desc">${t.d}</div>
+        </div>`).join('')}
+      </div>`;
+  } else if (OB.paso === 2) {
+    const labels = {quincenal:'quincena',semanal:'semana',mensual:'mes',variable:'periodo'};
+    nextBtn.textContent = 'Continuar';
+    body.innerHTML = `
+      <div><div class="ob-titulo">¿Cuánto recibes cada ${labels[OB.tipo]||'periodo'}?</div>
+      <div class="ob-subtitulo">Lo que cae a tu cuenta, ya descontado impuestos.</div></div>
+      <div class="field"><label>Ingreso neto (MXN)</label>
+        <input id="ob-monto" type="number" placeholder="8500" value="${OB.monto}" style="font-size:24px;font-family:var(--mono);padding:14px" oninput="OB.monto=this.value">
+      </div>
+      <div style="background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em">Tu disponible estimado</div>
+        <div style="font-size:22px;font-weight:500;color:var(--green);font-family:var(--mono)" id="ob-libre">$0</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">Después de apartar 10% de ahorro</div>
+      </div>`;
+    setTimeout(() => {
+      const inp = document.getElementById('ob-monto');
+      if (inp) inp.addEventListener('input', calcObLibre);
+      calcObLibre();
+    }, 50);
+  } else if (OB.paso === 3) {
+    nextBtn.textContent = '¡Crear mi cuenta!';
+    body.innerHTML = `
+      <div style="text-align:center;padding:8px 0">
+        <div style="width:56px;height:56px;border-radius:16px;background:var(--lima);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;color:var(--carbon);font-weight:500">${OB.nombre.charAt(0)||'?'}</div>
+        <div class="ob-titulo" style="text-align:center">¿Todo bien, ${OB.nombre}?</div>
+        <div class="ob-subtitulo" style="text-align:center">Confirma tus datos antes de crear tu cuenta.</div>
+      </div>
+      <div style="background:var(--crema2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        ${[
+          ['Nombre', OB.nombre],
+          ['Correo', OB.correo],
+          ['Tipo de ingreso', {quincenal:'Quincenal',semanal:'Semanal',mensual:'Mensual',variable:'Variable'}[OB.tipo]],
+          ['Ingreso base', fmtMon(OB.monto)],
+        ].map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text3)">${k}</span>
+          <span style="font-size:13px;font-weight:500">${v}</span>
+        </div>`).join('')}
+      </div>
+      <div style="background:var(--carbon);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:5px">Tu primera frase de lana.</div>
+        <div style="font-size:13px;color:#fff;line-height:1.5;font-weight:500">"El que sabe a dónde va su lana, siempre le alcanza para lo que importa."</div>
+      </div>`;
+  }
+}
+
+function calcObLibre() {
+  const inp = document.getElementById('ob-monto');
+  const el = document.getElementById('ob-libre');
+  if (!inp || !el) return;
+  const m = parseFloat(inp.value)||0;
+  OB.monto = m;
+  el.textContent = fmtMon(Math.max(0, m - Math.round(m*0.10)));
+}
+
+function selObTipo(tipo, el) {
+  OB.tipo = tipo;
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+async function obSiguiente() {
+  if (OB.paso === 0) {
+    OB.nombre = document.getElementById('ob-nombre')?.value.trim() || '';
+    OB.correo = document.getElementById('ob-correo')?.value.trim() || '';
+    OB.pass   = document.getElementById('ob-pass')?.value || '';
+    if (!OB.nombre || !OB.correo || !OB.pass) { toast('Completa todos los campos','error'); return; }
+    if (OB.pass.length < 6) { toast('La contraseña debe tener 6 caracteres mínimo','error'); return; }
+    OB.paso = 1;
+  } else if (OB.paso === 1) {
+    OB.paso = 2;
+  } else if (OB.paso === 2) {
+    OB.monto = parseFloat(document.getElementById('ob-monto')?.value)||0;
+    OB.paso = 3;
+  } else if (OB.paso === 3) {
+    // Crear cuenta
+    const btn = document.getElementById('ob-next-btn');
+    btn.textContent = 'Creando tu cuenta...';
+    btn.disabled = true;
+    try {
+      const data = await API('/api/auth/registro', { method:'POST', body:{
+        nombre: OB.nombre, correo: OB.correo, password: OB.pass,
+        tipo_ingreso: OB.tipo, monto_base: OB.monto
+      }});
+      TOKEN = data.token;
+      USER  = data.usuario;
+      localStorage.setItem('lana_token', TOKEN);
+      await cargarApp();
+      mostrarApp();
+      toast('¡Bienvenido a lana., ' + USER.nombre + '!');
+    } catch(e) {
+      toast(e.message, 'error');
+      btn.textContent = '¡Crear mi cuenta!';
+      btn.disabled = false;
+    }
+    return;
+  }
+  renderOb();
+}
+
+function obAtras() {
+  if (OB.paso === 0) { irA('p-bienvenida'); return; }
+  OB.paso--;
+  renderOb();
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function login() {
+  const correo = document.getElementById('l-correo').value.trim();
+  const pass   = document.getElementById('l-pass').value;
+  if (!correo || !pass) { toast('Completa correo y contraseña','error'); return; }
+  try {
+    const data = await API('/api/auth/login', { method:'POST', body:{ correo, password:pass } });
+    TOKEN = data.token;
+    USER  = data.usuario;
+    localStorage.setItem('lana_token', TOKEN);
+    await cargarApp();
+    mostrarApp();
+    toast('¡Bienvenido de vuelta, ' + USER.nombre + '!');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+const FRASES = [
+  "El que sabe a dónde va su lana, siempre le alcanza para lo que importa.",
+  "No es que no te alcance. Es que le alcanzas a todo menos a ti.",
+  "Antes de pagar con tarjeta pregúntate: ¿el yo de la próxima quincena va a estar de acuerdo?",
+  "El dinero no se va solo — tú lo mandas.",
+  "Ahorrar no es guardar lo que sobra. Es gastar lo que queda después de ahorrar.",
+  "Una deuda pequeña hoy puede ser una deuda grande mañana si no la atiendes.",
+  "Tu sueldo no es tuyo hasta que pagas lo que debes.",
+  "El presupuesto no es una cárcel — es el mapa para llegar a donde quieres.",
+  "Cada peso que gastas es una decisión. ¿Estás decidiendo bien?",
+  "No hay inversión más rentable que entender tu propio dinero.",
+];
+
+function renderAprende() {
+  const idx = new Date().getDate() % FRASES.length;
+  const el = document.getElementById('frase-del-dia');
+  if (el) el.textContent = '"' + FRASES[idx] + '"';
+}
+
+function cerrarSesion() {
+  TOKEN = null; USER = null;
+  localStorage.removeItem('lana_token');
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('p-bienvenida').classList.add('activa');
+  document.getElementById('p-app').classList.remove('activa');
+  document.getElementById('p-app').style.display = 'none';
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function mostrarApp() {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  const app = document.getElementById('p-app');
+  app.style.display = 'flex';
+  app.classList.add('activa');
+  if (USER) {
+    document.getElementById('app-avatar').textContent = USER.nombre.charAt(0).toUpperCase();
+    document.getElementById('prf-nombre').value  = USER.nombre;
+    document.getElementById('prf-tipo').value    = USER.tipo_ingreso;
+    document.getElementById('prf-monto').value   = USER.monto_base;
+  }
+}
+
+function navegar(page) {
+  document.querySelectorAll('.app-page').forEach(p => p.classList.remove('activo'));
+  document.querySelectorAll('.app-nav-btn').forEach(b => b.classList.remove('activo'));
+  document.getElementById('page-'+page)?.classList.add('activo');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('activo');
+  if (page==='inicio') renderInicio();
+  if (page==='gastos') renderMovimientos('gasto');
+  if (page==='ingresos') renderMovimientos('ingreso');
+  if (page==='cuentas') renderCuentas();
+  if (page==='categorias') renderCategorias();
+  if (page==='aprende') renderAprende();
+}
+
+async function cargarApp() {
+  try {
+    USER = await API('/api/auth/me');
+    const [cuentas, catG, catI, resumen] = await Promise.all([
+      API('/api/cuentas'),
+      API('/api/categorias/gasto'),
+      API('/api/categorias/ingreso'),
+      API('/api/resumen'),
+    ]);
+    DATA.cuentas    = cuentas;
+    DATA.catGasto   = catG;
+    DATA.catIngreso = catI;
+    DATA.resumen    = resumen;
+  } catch(e) { console.error(e); }
+}
+
+// ── Renders ───────────────────────────────────────────────────────────────────
+function renderInicio() {
+  const r = DATA.resumen;
+  if (!r) return;
+  const p = r.periodo;
+  if (p) {
+    const base      = parseFloat(p.monto_base);
+    const extras    = parseFloat(r.periodo?.extras || 0);
+    const gastado   = parseFloat(p.total_gastos || 0);
+    const disponible = Math.max(0, base + extras - gastado);
+    const ahorro    = Math.round(base * 0.10);
+    const pct       = base > 0 ? Math.min(100, Math.round((gastado / base) * 100)) : 0;
+    const dias      = Math.max(0, Math.ceil((new Date(p.fecha_fin) - new Date()) / 86400000));
+    document.getElementById('h-disponible').textContent = fmtMon(disponible);
+    document.getElementById('h-sub').textContent = `de ${fmtMon(base)} base · ${dias} días restantes`;
+    document.getElementById('h-bar').style.width = pct + '%';
+    document.getElementById('h-gastado').textContent = fmtMon(gastado);
+    document.getElementById('h-ahorro').textContent  = fmtMon(ahorro);
+  }
+  const todayStr = hoy();
+  const gastosHoy = (r.ultimos_movimientos||[])
+    .filter(m => m.tipo==='gasto' && m.fecha?.startsWith?.(todayStr))
+    .reduce((a,m) => a+parseFloat(m.monto), 0);
+  document.getElementById('s-hoy').textContent = fmtMon(gastosHoy);
+  document.getElementById('s-cuentas').textContent = fmtMon(r.total_cuentas);
+
+  const lista = document.getElementById('lista-ultimos');
+  const movs = r.ultimos_movimientos || [];
+  if (!movs.length) { lista.innerHTML = '<div class="empty">Sin movimientos aún — ¡registra tu primer gasto!</div>'; return; }
+  lista.innerHTML = movs.map(m => movHTML(m)).join('');
+}
+
+function movHTML(m) {
+  const esGasto = m.tipo==='gasto';
+  const bg = esGasto ? '#FCEBEB' : '#EAF3DE';
+  const ic = esGasto ? '↓' : '↑';
+  const icColor = esGasto ? '#A32D2D' : '#3B6D11';
+  const amtColor = esGasto ? 'color:var(--red)' : 'color:var(--green)';
+  const signo = esGasto ? '-' : '+';
+  const fecha = m.fecha ? new Date(m.fecha+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'}) : '';
+  return `<div class="mov-item">
+    <div class="mov-icon" style="background:${bg};color:${icColor};font-size:16px;font-weight:500">${ic}</div>
+    <div class="mov-info">
+      <div class="mov-name">${m.descripcion||m.categoria_nombre||'Sin descripción'}</div>
+      <div class="mov-sub">${m.categoria_nombre||''} · ${m.cuenta_nombre||''} · ${fecha}</div>
+    </div>
+    <div class="mov-amt" style="${amtColor}">${signo}${fmtMon(m.monto)}</div>
+  </div>`;
+}
+
+async function renderMovimientos(tipo) {
+  try {
+    const movs = await API(`/api/movimientos?tipo=${tipo}&limit=30`);
+    const id = tipo==='gasto' ? 'lista-gastos' : 'lista-ingresos';
+    const el = document.getElementById(id);
+    if (!movs.length) { el.innerHTML = '<div class="empty">Sin '+tipo+'s registrados aún</div>'; return; }
+    el.innerHTML = '<div class="card" style="padding:4px 16px">'+movs.map(m=>movHTML(m)).join('')+'</div>';
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function renderCuentas() {
+  const el = document.getElementById('lista-cuentas');
+  if (!DATA.cuentas.length) { el.innerHTML = '<div class="empty">Sin cuentas — agrega tu primera</div>'; return; }
+  const ICONS = {efectivo:'💵',debito:'💳',credito:'💳',ahorro:'🐷'};
+  const COLORS = {efectivo:'#EAF3DE',debito:'#E6F1FB',credito:'#FCEBEB',ahorro:'#FAEEDA'};
+  el.innerHTML = DATA.cuentas.map(c => `
+    <div class="cuenta-card">
+      <div class="cuenta-icon" style="background:${COLORS[c.tipo]||'#F0EEE9'}">${ICONS[c.tipo]||'💰'}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${c.nombre}</div>
+        <div style="font-size:11px;color:var(--text3)">${c.tipo}</div>
+        <div class="cuenta-bal" style="color:${parseFloat(c.saldo)<0?'var(--red)':'var(--text)'}">${fmtMon(c.saldo)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCategorias() {
+  const rg = document.getElementById('lista-cat-gasto');
+  const ri = document.getElementById('lista-cat-ingreso');
+  const tagStyle = 'display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;margin:3px 4px 3px 0';
+
+  if (!DATA.catGasto.length) { rg.innerHTML = '<div class="empty">Sin categorías</div>'; }
+  else rg.innerHTML = DATA.catGasto.map(c =>
+    `<span style="${tagStyle};background:var(--crema3);border:1px solid var(--border)">${c.nombre}${!c.es_default?` <span onclick="eliminarCat('gasto',${c.id})" style="cursor:pointer;color:var(--red)">×</span>`:''}</span>`
+  ).join('');
+
+  if (!DATA.catIngreso.length) { ri.innerHTML = '<div class="empty">Sin categorías</div>'; }
+  else ri.innerHTML = DATA.catIngreso.map(c =>
+    `<span style="${tagStyle};background:var(--crema3);border:1px solid var(--border)">${c.nombre}${!c.es_default?` <span onclick="eliminarCat('ingreso',${c.id})" style="cursor:pointer;color:var(--red)">×</span>`:''}</span>`
+  ).join('');
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────────
+function abrirNuevoMovimiento(tipo) {
+  document.getElementById('mov-titulo').textContent = tipo==='gasto' ? 'Nuevo gasto' : 'Nuevo ingreso';
+  document.getElementById('mov-tipo').value = tipo;
+  document.getElementById('mov-fecha').value = hoy();
+  document.getElementById('mov-monto').value = '';
+  document.getElementById('mov-desc').value  = '';
+  document.getElementById('mov-extra-wrap').style.display = tipo==='ingreso' ? 'block' : 'none';
+
+  const catSel = document.getElementById('mov-cat');
+  const cats = tipo==='gasto' ? DATA.catGasto : DATA.catIngreso;
+  catSel.innerHTML = cats.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+
+  const ctaSel = document.getElementById('mov-cuenta');
+  ctaSel.innerHTML = DATA.cuentas.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+
+  abrirModal('ov-mov');
+}
+
+async function guardarMovimiento() {
+  const tipo   = document.getElementById('mov-tipo').value;
+  const monto  = parseFloat(document.getElementById('mov-monto').value);
+  const fecha  = document.getElementById('mov-fecha').value;
+  const catId  = document.getElementById('mov-cat').value;
+  const ctaId  = document.getElementById('mov-cuenta').value;
+  const desc   = document.getElementById('mov-desc').value.trim();
+  const sub    = document.getElementById('mov-subtipo')?.value || 'normal';
+  if (!monto || !fecha) { toast('Monto y fecha son requeridos','error'); return; }
+  try {
+    const periodo = await API('/api/periodos/activo');
+    await API('/api/movimientos', { method:'POST', body:{
+      tipo, monto, fecha, descripcion:desc,
+      categoria_id: catId || null,
+      cuenta_id: ctaId || null,
+      periodo_id: periodo?.id || null,
+      subtipo: tipo==='ingreso' ? sub : 'normal',
+    }});
+    cerrarModal('ov-mov');
+    toast(tipo==='gasto' ? 'Gasto registrado' : 'Ingreso registrado');
+    await cargarApp();
+    renderInicio();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function abrirNuevaCuenta() {
+  document.getElementById('cuenta-titulo').textContent = 'Nueva cuenta';
+  document.getElementById('cta-nombre').value = '';
+  document.getElementById('cta-saldo').value  = '';
+  document.getElementById('cta-tipo').value   = 'debito';
+  abrirModal('ov-cuenta');
+}
+
+async function guardarCuenta() {
+  const nombre = document.getElementById('cta-nombre').value.trim();
+  const tipo   = document.getElementById('cta-tipo').value;
+  const saldo  = parseFloat(document.getElementById('cta-saldo').value)||0;
+  if (!nombre) { toast('El nombre es requerido','error'); return; }
+  try {
+    await API('/api/cuentas', { method:'POST', body:{ nombre, tipo, saldo }});
+    cerrarModal('ov-cuenta');
+    toast('Cuenta creada');
+    DATA.cuentas = await API('/api/cuentas');
+    renderCuentas();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function abrirNuevaCat(tipo) {
+  document.getElementById('cat-titulo').textContent = 'Nueva categoría de ' + tipo;
+  document.getElementById('cat-tipo-hidden').value = tipo;
+  document.getElementById('cat-nombre').value = '';
+  abrirModal('ov-cat');
+}
+
+async function guardarCategoria() {
+  const tipo   = document.getElementById('cat-tipo-hidden').value;
+  const nombre = document.getElementById('cat-nombre').value.trim();
+  if (!nombre) { toast('El nombre es requerido','error'); return; }
+  try {
+    await API('/api/categorias/'+tipo, { method:'POST', body:{ nombre }});
+    cerrarModal('ov-cat');
+    toast('Categoría creada');
+    DATA.catGasto   = await API('/api/categorias/gasto');
+    DATA.catIngreso = await API('/api/categorias/ingreso');
+    renderCategorias();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function eliminarCat(tipo, id) {
+  try {
+    await API(`/api/categorias/${tipo}/${id}`, { method:'DELETE' });
+    toast('Categoría eliminada');
+    DATA.catGasto   = await API('/api/categorias/gasto');
+    DATA.catIngreso = await API('/api/categorias/ingreso');
+    renderCategorias();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function guardarPerfil() {
+  const nombre = document.getElementById('prf-nombre').value.trim();
+  const tipo   = document.getElementById('prf-tipo').value;
+  const monto  = parseFloat(document.getElementById('prf-monto').value)||0;
+  try {
+    USER = await API('/api/auth/perfil', { method:'PUT', body:{ nombre, tipo_ingreso:tipo, monto_base:monto }});
+    document.getElementById('app-avatar').textContent = USER.nombre.charAt(0).toUpperCase();
+    toast('Perfil actualizado');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ── Arranque ──────────────────────────────────────────────────────────────────
+(async function() {
+  if (TOKEN) {
+    try {
+      await cargarApp();
+      mostrarApp();
+      renderInicio();
+    } catch {
+      localStorage.removeItem('lana_token');
+      TOKEN = null;
+    }
+  }
+})();
+</script>
+</body>
+</html>
